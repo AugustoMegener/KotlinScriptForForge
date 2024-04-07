@@ -1,7 +1,9 @@
 package ru.hollowhorizon.kotlinscript.common.scripting
 
 import kotlinx.coroutines.runBlocking
+import net.minecraftforge.common.MinecraftForge
 import ru.hollowhorizon.kotlinscript.KotlinScriptForForge
+import ru.hollowhorizon.kotlinscript.common.events.*
 import ru.hollowhorizon.kotlinscript.common.scripting.kotlin.AbstractHollowScriptHost
 import ru.hollowhorizon.kotlinscript.common.scripting.kotlin.HollowScript
 import ru.hollowhorizon.kotlinscript.common.scripting.kotlin.loadScriptFromJar
@@ -17,11 +19,9 @@ import kotlin.script.experimental.api.*
 import kotlin.script.experimental.host.FileScriptSource
 import kotlin.script.experimental.host.createCompilationConfigurationFromTemplate
 import kotlin.script.experimental.host.toScriptSource
-import kotlin.script.experimental.jvm.defaultJvmScriptingHostConfiguration
 import kotlin.script.experimental.jvm.impl.*
 import kotlin.script.experimental.jvm.util.isError
 import kotlin.script.experimental.jvmhost.JvmScriptCompiler
-import kotlin.script.experimental.jvmhost.createJvmCompilationConfigurationFromTemplate
 import kotlin.script.experimental.util.PropertiesCollection
 
 fun <R> ResultWithDiagnostics<R>.orException(): R = valueOr {
@@ -63,25 +63,6 @@ fun ResultWithDiagnostics.Failure.errors(): List<String> = reports.map { diagnos
 }.filter { it.isNotEmpty() }
 
 object ScriptingCompiler {
-    inline fun <reified T : Any> compileText(code: String): CompiledScript {
-        val hostConfiguration = AbstractHollowScriptHost()
-
-        val compilationConfiguration = createCompilationConfigurationFromTemplate(
-            KotlinType(T::class),
-            hostConfiguration,
-            KotlinScriptForForge::class
-        ) {}
-
-        val compiled = runBlocking {
-
-            val compiler = JvmScriptCompiler(hostConfiguration)
-
-            compiler(code.toScriptSource(), compilationConfiguration)
-        }
-        return CompiledScript("code.kts", code.hashCode().toString(), compiled.valueOrNull(), null).apply {
-            errors = if(compiled.isError()) (compiled as ResultWithDiagnostics.Failure).errors() else null
-        }
-    }
 
     inline fun <reified T : Any> compileFile(script: File): CompiledScript {
         val hostConfiguration = AbstractHollowScriptHost()
@@ -110,7 +91,16 @@ object ScriptingCompiler {
                 script.name, hashcode,
                 compiled.valueOrNull(), compiledJar
             ).apply {
-                errors = if(compiled.isError()) (compiled as ResultWithDiagnostics.Failure).errors() else null
+                if(compiled.isError()) {
+                    val errors = compiled.reports.map { ScriptError(Severity.values()[it.severity.ordinal], it.message, it.sourcePath ?: "", it.location?.start?.line ?: 0, it.location?.start?.col ?: 0, it.exception) }
+
+                    if(!MinecraftForge.EVENT_BUS.post(ScriptErrorEvent(script, ErrorType.COMPILATION_ERROR, errors))) {
+                        this.errors = if (compiled.isError()) (compiled as ResultWithDiagnostics.Failure).errors() else null
+                    }
+                } else {
+                    MinecraftForge.EVENT_BUS.post(ScriptCompiledEvent(script))
+                }
+
             }
         }
     }
@@ -165,22 +155,4 @@ object ScriptingCompiler {
 private fun shrinkSerializableScriptData(compiledScript: KJvmCompiledScript) {
     (compiledScript.compilationConfiguration.entries() as? MutableSet<Map.Entry<PropertiesCollection.Key<*>, Any?>>)
         ?.removeIf { it.key == ScriptCompilationConfiguration.dependencies || it.key == ScriptCompilationConfiguration.defaultImports }
-}
-
-fun main() {
-    val command = """
-        import ru.hollowhorizon.kotlinscript.KotlinScriptForForge
-        
-        KotlinScriptForForge.LOGGER.info("Scripting Engine Loaded!")
-    """.trimIndent()
-
-    val script = ScriptingCompiler.compileText<HollowScript>(command)
-
-    script.errors?.forEach { KotlinScriptForForge.LOGGER.error(it) }
-
-    val result = script.execute()
-
-    result.reports.map { it.render() }.forEach { KotlinScriptForForge.LOGGER.error(it)}
-
-    println(result.valueOrThrow().returnValue)
 }
