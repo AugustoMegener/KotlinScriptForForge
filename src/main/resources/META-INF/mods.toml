@@ -1,6 +1,7 @@
 modLoader = "kotlinforforge"
 loaderVersion = "[3,)"
 license = "MIT License"
+logoFile="kotlinscript.png"
 [[mods]]
 modId = "kotlinscript"
 version = "1.0"
