@@ -4,7 +4,7 @@ license = "MIT License"
 logoFile="kotlinscript.png"
 [[mods]]
 modId = "kotlinscript"
-version = "1.1"
+version = "1.2"
 displayName = "KotlinScript For Forge"
 displayURL = "https://github.com/HollowHorizon/"
 authors = "HolloHorizon"

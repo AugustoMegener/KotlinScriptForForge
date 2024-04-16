@@ -1,3 +1,27 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2024 HollowHorizon
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package ru.hollowhorizon.kotlinscript.common.scripting
 
 import kotlinx.coroutines.runBlocking
@@ -5,7 +29,6 @@ import net.minecraftforge.common.MinecraftForge
 import ru.hollowhorizon.kotlinscript.KotlinScriptForForge
 import ru.hollowhorizon.kotlinscript.common.events.*
 import ru.hollowhorizon.kotlinscript.common.scripting.kotlin.AbstractHollowScriptHost
-import ru.hollowhorizon.kotlinscript.common.scripting.kotlin.HollowScript
 import ru.hollowhorizon.kotlinscript.common.scripting.kotlin.loadScriptFromJar
 import ru.hollowhorizon.kotlinscript.common.scripting.kotlin.loadScriptHashCode
 import java.io.ByteArrayOutputStream
@@ -17,8 +40,8 @@ import java.util.jar.JarOutputStream
 import java.util.jar.Manifest
 import kotlin.script.experimental.api.*
 import kotlin.script.experimental.host.FileScriptSource
+import kotlin.script.experimental.host.StringScriptSource
 import kotlin.script.experimental.host.createCompilationConfigurationFromTemplate
-import kotlin.script.experimental.host.toScriptSource
 import kotlin.script.experimental.jvm.impl.*
 import kotlin.script.experimental.jvm.util.isError
 import kotlin.script.experimental.jvmhost.JvmScriptCompiler
@@ -64,6 +87,31 @@ fun ResultWithDiagnostics.Failure.errors(): List<String> = reports.map { diagnos
 
 object ScriptingCompiler {
 
+    inline fun <reified T : Any> compileText(text: String): CompiledScript {
+        val hostConfiguration = AbstractHollowScriptHost()
+
+        val compilationConfiguration = createCompilationConfigurationFromTemplate(
+            KotlinType(T::class),
+            hostConfiguration,
+            KotlinScriptForForge::class
+        ) {}
+
+        return runBlocking {
+            val compiler = JvmScriptCompiler(hostConfiguration)
+            val compiled = compiler(StringScriptSource(text), compilationConfiguration)
+
+            return@runBlocking CompiledScript(
+                "script.kts", "",
+                compiled.valueOrNull(), null
+            ).apply {
+                if (compiled.isError()) {
+                    this.errors = if (compiled.isError()) (compiled as ResultWithDiagnostics.Failure).errors() else null
+                }
+
+            }
+        }
+    }
+
     inline fun <reified T : Any> compileFile(script: File): CompiledScript {
         val hostConfiguration = AbstractHollowScriptHost()
 
@@ -91,11 +139,21 @@ object ScriptingCompiler {
                 script.name, hashcode,
                 compiled.valueOrNull(), compiledJar
             ).apply {
-                if(compiled.isError()) {
-                    val errors = compiled.reports.map { ScriptError(Severity.values()[it.severity.ordinal], it.message, it.sourcePath ?: "", it.location?.start?.line ?: 0, it.location?.start?.col ?: 0, it.exception) }
+                if (compiled.isError()) {
+                    val errors = compiled.reports.map {
+                        ScriptError(
+                            Severity.values()[it.severity.ordinal],
+                            it.message,
+                            it.sourcePath ?: "",
+                            it.location?.start?.line ?: 0,
+                            it.location?.start?.col ?: 0,
+                            it.exception
+                        )
+                    }
 
-                    if(!MinecraftForge.EVENT_BUS.post(ScriptErrorEvent(script, ErrorType.COMPILATION_ERROR, errors))) {
-                        this.errors = if (compiled.isError()) (compiled as ResultWithDiagnostics.Failure).errors() else null
+                    if (!MinecraftForge.EVENT_BUS.post(ScriptErrorEvent(script, ErrorType.COMPILATION_ERROR, errors))) {
+                        this.errors =
+                            if (compiled.isError()) (compiled as ResultWithDiagnostics.Failure).errors() else null
                     }
                 } else {
                     MinecraftForge.EVENT_BUS.post(ScriptCompiledEvent(script))
