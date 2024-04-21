@@ -26,6 +26,7 @@ package ru.hollowhorizon.kotlinscript.common.scripting
 
 import kotlinx.coroutines.runBlocking
 import net.minecraftforge.common.MinecraftForge
+import net.minecraftforge.fml.loading.FMLPaths
 import ru.hollowhorizon.kotlinscript.KotlinScriptForForge
 import ru.hollowhorizon.kotlinscript.common.events.*
 import ru.hollowhorizon.kotlinscript.common.scripting.kotlin.AbstractHollowScriptHost
@@ -102,7 +103,7 @@ object ScriptingCompiler {
 
             return@runBlocking CompiledScript(
                 "script.kts", "",
-                compiled.valueOrNull(), null
+                compiled.valueOrNull(), FMLPaths.GAMEDIR.get().resolve("script.kts").toFile()
             ).apply {
                 if (compiled.isError()) {
                     this.errors = if (compiled.isError()) (compiled as ResultWithDiagnostics.Failure).errors() else null
@@ -128,7 +129,7 @@ object ScriptingCompiler {
             if (compiledJar.exists() && compiledJar.loadScriptHashCode() == hashcode) {
                 return@runBlocking CompiledScript(
                     script.name, hashcode,
-                    compiledJar.loadScriptFromJar(), null
+                    compiledJar.loadScriptFromJar(), script
                 )
             }
 
@@ -137,7 +138,7 @@ object ScriptingCompiler {
 
             return@runBlocking CompiledScript(
                 script.name, hashcode,
-                compiled.valueOrNull(), compiledJar
+                compiled.valueOrNull(), script
             ).apply {
                 if (compiled.isError()) {
                     val errors = compiled.reports.map {
@@ -156,6 +157,7 @@ object ScriptingCompiler {
                             if (compiled.isError()) (compiled as ResultWithDiagnostics.Failure).errors() else null
                     }
                 } else {
+                    save(compiledJar)
                     MinecraftForge.EVENT_BUS.post(ScriptCompiledEvent(script))
                 }
 

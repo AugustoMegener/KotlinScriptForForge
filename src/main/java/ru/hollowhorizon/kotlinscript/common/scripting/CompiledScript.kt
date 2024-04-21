@@ -25,6 +25,8 @@
 package ru.hollowhorizon.kotlinscript.common.scripting
 
 import kotlinx.coroutines.runBlocking
+import net.minecraftforge.common.MinecraftForge
+import ru.hollowhorizon.kotlinscript.common.events.ScriptStartedEvent
 import ru.hollowhorizon.kotlinscript.common.scripting.ScriptingCompiler.saveScriptToJar
 import java.io.File
 import kotlin.script.experimental.api.*
@@ -36,12 +38,13 @@ data class CompiledScript(
     val scriptName: String,
     val hash: String,
     val script: CompiledScript?,
-    val saveFile: File?,
+    val scriptFile: File,
 ) {
     var errors: List<String>? = null
 
-    init {
-        if (saveFile != null && script != null) (script as KJvmCompiledScript).saveScriptToJar(saveFile, hash)
+    fun save(file: File) {
+        if (script == null) return
+        (script as KJvmCompiledScript).saveScriptToJar(file, hash)
     }
 
     fun execute(body: ScriptEvaluationConfiguration.Builder.() -> Unit = {}): ResultWithDiagnostics<EvaluationResult> {
@@ -55,6 +58,14 @@ data class CompiledScript(
 
         val evalConfig = ScriptEvaluationConfiguration { body() }
         val evaluator = BasicJvmScriptEvaluator()
-        return runBlocking { evaluator(script, evalConfig) }
+        val result = runBlocking {
+            evaluator(script, evalConfig)
+        }
+
+
+        if (result is ResultWithDiagnostics.Success) MinecraftForge.EVENT_BUS.post(ScriptStartedEvent(scriptFile))
+
+
+        return result
     }
 }

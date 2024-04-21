@@ -34,6 +34,7 @@ open class ScriptEvent(val file: File) : Event()
 class ScriptErrorEvent(file: File, val type: ErrorType, val error: List<ScriptError>) : ScriptEvent(file)
 
 class ScriptCompiledEvent(file: File) : ScriptEvent(file)
+class ScriptStartedEvent(file: File) : ScriptEvent(file)
 
 class ScriptError(
     val severity: Severity,
