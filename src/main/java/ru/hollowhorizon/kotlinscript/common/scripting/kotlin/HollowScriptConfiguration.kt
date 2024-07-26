@@ -79,6 +79,10 @@ abstract class AbstractHollowScriptConfiguration(body: Builder.() -> Unit) : Scr
         files.addAll(FMLLoader.getLaunchHandler().minecraftPaths.otherArtifacts.map { File(it.absolutePathString()) })
         files.addAll(FMLLoader.getLaunchHandler().minecraftPaths.minecraftPaths.map { File(it.absolutePathString()) })
 
+        if (FMLLoader.getDist().isDedicatedServer) {
+            listFilesRecursively(FMLLoader.getGamePath().resolve("libraries").toFile(), files)
+        }
+
         dependenciesFromClassContext(HollowScriptConfiguration::class, wholeClasspath = true)
 
         files.removeIf { it.isDirectory }
@@ -95,6 +99,13 @@ abstract class AbstractHollowScriptConfiguration(body: Builder.() -> Unit) : Scr
 
     ide { acceptedLocations(ScriptAcceptedLocation.Everywhere) }
 })
+
+private fun listFilesRecursively(directory: File, fileList: HashSet<File>) {
+    directory.listFiles()?.forEach {
+        if (it.isDirectory) listFilesRecursively(it, fileList)
+        else fileList.add(it)
+    }
+}
 
 class HollowScriptConfigurator : RefineScriptCompilationConfigurationHandler {
     override operator fun invoke(context: ScriptConfigurationRefinementContext) = processAnnotations(context)
