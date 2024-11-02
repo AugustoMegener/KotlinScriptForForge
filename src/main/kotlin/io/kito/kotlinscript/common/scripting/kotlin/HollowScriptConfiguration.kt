@@ -22,12 +22,12 @@
  * SOFTWARE.
  */
 
-package ru.hollowhorizon.kotlinscript.common.scripting.kotlin
+package io.kito.kotlinscript.common.scripting.kotlin
 
 import cpw.mods.modlauncher.TransformingClassLoader
 import net.minecraftforge.fml.ModList
 import net.minecraftforge.fml.loading.FMLLoader
-import ru.hollowhorizon.kotlinscript.KotlinScriptForForge
+import io.kito.kotlinscript.KotlinScriptForForge
 import java.io.File
 import kotlin.io.path.absolutePathString
 import kotlin.script.experimental.annotations.KotlinScript

@@ -22,12 +22,12 @@
  * SOFTWARE.
  */
 
-package ru.hollowhorizon.kotlinscript.common.scripting
+package io.kito.kotlinscript.common.scripting
 
 import kotlinx.coroutines.runBlocking
 import net.minecraftforge.common.MinecraftForge
-import ru.hollowhorizon.kotlinscript.common.events.ScriptStartedEvent
-import ru.hollowhorizon.kotlinscript.common.scripting.ScriptingCompiler.saveScriptToJar
+import io.kito.kotlinscript.common.events.ScriptStartedEvent
+import io.kito.kotlinscript.common.scripting.ScriptingCompiler.saveScriptToJar
 import java.io.File
 import kotlin.script.experimental.api.*
 import kotlin.script.experimental.api.CompiledScript

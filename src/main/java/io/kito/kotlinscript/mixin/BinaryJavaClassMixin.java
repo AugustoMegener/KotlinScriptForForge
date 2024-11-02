@@ -22,14 +22,14 @@
  * SOFTWARE.
  */
 
-package ru.hollowhorizon.kotlinscript.mixin;
+package io.kito.kotlinscript.mixin;
 
 import net.minecraftforge.fml.loading.FMLEnvironment;
 import org.jetbrains.kotlin.load.java.structure.impl.classFiles.BinaryJavaClass;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
-import ru.hollowhorizon.kotlinscript.common.scripting.mappings.HollowMappings;
+import io.kito.kotlinscript.common.scripting.mappings.HollowMappings;
 
 @Mixin(value = BinaryJavaClass.class, remap = false)
 public abstract class BinaryJavaClassMixin {

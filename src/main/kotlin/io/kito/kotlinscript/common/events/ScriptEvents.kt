@@ -22,25 +22,33 @@
  * SOFTWARE.
  */
 
-package ru.hollowhorizon.kotlinscript.mixin;
+package io.kito.kotlinscript.common.events
 
-import net.minecraftforge.fml.ModList;
-import org.jetbrains.kotlin.cli.jvm.compiler.KotlinCoreEnvironment;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Redirect;
-import ru.hollowhorizon.kotlinscript.KotlinScriptForForge;
+import net.minecraftforge.eventbus.api.Cancelable
+import net.minecraftforge.eventbus.api.Event
+import java.io.File
 
-import java.io.File;
+open class ScriptEvent(val file: File) : Event()
 
-@Mixin(KotlinCoreEnvironment.Companion.class)
-public class KotlinCoreEnvironmentMixin {
+@Cancelable
+class ScriptErrorEvent(file: File, val type: ErrorType, val error: List<ScriptError>) : ScriptEvent(file)
 
-    /**
-     * Specify the correct path to the compiler configuration (It is embedded in HollowCore)
-     */
-    @Redirect(method = "registerApplicationExtensionPointsAndExtensionsFrom", at = @At(value = "INVOKE", target = "Lorg/jetbrains/kotlin/utils/PathUtil;getResourcePathForClass(Ljava/lang/Class;)Ljava/io/File;"), remap = false)
-    private File getResourcePathForClass(Class<?> aClass) {
-        return ModList.get().getModFileById(KotlinScriptForForge.MODID).getFile().getFilePath().toFile();
-    }
+class ScriptCompiledEvent(file: File) : ScriptEvent(file)
+class ScriptStartedEvent(file: File) : ScriptEvent(file)
+
+class ScriptError(
+    val severity: Severity,
+    val message: String,
+    val source: String,
+    val line: Int,
+    val column: Int,
+    val exception: Throwable?
+)
+
+enum class Severity {
+    DEBUG, INFO, WARNING, ERROR, FATAL
+}
+
+enum class ErrorType {
+    COMPILATION_ERROR, RUNTIME_ERROR
 }

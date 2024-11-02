@@ -22,17 +22,17 @@
  * SOFTWARE.
  */
 
-package ru.hollowhorizon.kotlinscript.mixin;
+package io.kito.kotlinscript.mixin;
 
-import org.jetbrains.kotlin.scripting.compiler.plugin.impl.ScriptJvmCompilerImplsKt;
-import org.jetbrains.kotlin.scripting.compiler.plugin.impl.ScriptJvmCompilerIsolated;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.gen.Accessor;
 
-@Mixin(ScriptJvmCompilerImplsKt.class)
-public class ScriptingJvmCompilerIsolatedMixin {
-    //@Inject()
-    private void onCompile() {
+import java.util.List;
 
-    }
+@Mixin(ListTag.class)
+public interface ListTagAccessor {
+    @Accessor("list")
+    List<Tag> list();
 }

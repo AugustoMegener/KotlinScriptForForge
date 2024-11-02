@@ -22,13 +22,13 @@
  * SOFTWARE.
  */
 
-package ru.hollowhorizon.kotlinscript
+package io.kito.kotlinscript
 
 import net.minecraftforge.fml.common.Mod
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
-import ru.hollowhorizon.kotlinscript.common.scripting.ScriptingCompiler
-import ru.hollowhorizon.kotlinscript.common.scripting.kotlin.HollowScript
+import io.kito.kotlinscript.common.scripting.ScriptingCompiler
+import io.kito.kotlinscript.common.scripting.kotlin.HollowScript
 
 
 @Mod(KotlinScriptForForge.MODID)
@@ -38,7 +38,7 @@ object KotlinScriptForForge {
 
     init {
         ScriptingCompiler.compileText<HollowScript>(
-            "ru.hollowhorizon.hc.HollowCore.LOGGER.info(\"KotlinScriptForForge successfully loaded!\")"
+            "io.kito.KotlinScriptForForge.LOGGER.info(\"KotlinScriptForForge successfully loaded!\")"
         ).execute()
     }
 }

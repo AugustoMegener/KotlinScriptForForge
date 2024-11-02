@@ -22,13 +22,13 @@
  * SOFTWARE.
  */
 
-package ru.hollowhorizon.kotlinscript.common.scripting.mappings
+package io.kito.kotlinscript.common.scripting.mappings
 
 import cpw.mods.modlauncher.TransformingClassLoader
 import org.objectweb.asm.ClassReader
 import org.objectweb.asm.ClassWriter
 import org.objectweb.asm.tree.*
-import ru.hollowhorizon.kotlinscript.KotlinScriptForForge
+import io.kito.kotlinscript.KotlinScriptForForge
 import java.io.ByteArrayInputStream
 
 object ASMRemapper {

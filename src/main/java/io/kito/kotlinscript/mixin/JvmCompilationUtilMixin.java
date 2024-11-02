@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package ru.hollowhorizon.kotlinscript.mixin;
+package io.kito.kotlinscript.mixin;
 
 import net.minecraftforge.fml.loading.FMLEnvironment;
 import org.jetbrains.kotlin.backend.common.output.OutputFile;
@@ -34,7 +34,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import ru.hollowhorizon.kotlinscript.common.scripting.mappings.ASMRemapper;
+import io.kito.kotlinscript.common.scripting.mappings.ASMRemapper;
 
 @Mixin(value = JvmCompilationUtilKt.class, remap = false)
 public class JvmCompilationUtilMixin {

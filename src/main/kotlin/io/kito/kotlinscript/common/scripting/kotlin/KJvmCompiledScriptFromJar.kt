@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package ru.hollowhorizon.kotlinscript.common.scripting.kotlin
+package io.kito.kotlinscript.common.scripting.kotlin
 
 import java.io.File
 import java.io.InputStream

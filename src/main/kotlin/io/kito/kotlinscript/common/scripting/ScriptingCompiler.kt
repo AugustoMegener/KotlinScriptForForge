@@ -22,16 +22,16 @@
  * SOFTWARE.
  */
 
-package ru.hollowhorizon.kotlinscript.common.scripting
+package io.kito.kotlinscript.common.scripting
 
 import kotlinx.coroutines.runBlocking
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.fml.loading.FMLPaths
-import ru.hollowhorizon.kotlinscript.KotlinScriptForForge
-import ru.hollowhorizon.kotlinscript.common.events.*
-import ru.hollowhorizon.kotlinscript.common.scripting.kotlin.AbstractHollowScriptHost
-import ru.hollowhorizon.kotlinscript.common.scripting.kotlin.loadScriptFromJar
-import ru.hollowhorizon.kotlinscript.common.scripting.kotlin.loadScriptHashCode
+import io.kito.kotlinscript.KotlinScriptForForge
+import io.kito.kotlinscript.common.events.*
+import io.kito.kotlinscript.common.scripting.kotlin.AbstractHollowScriptHost
+import io.kito.kotlinscript.common.scripting.kotlin.loadScriptFromJar
+import io.kito.kotlinscript.common.scripting.kotlin.loadScriptHashCode
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream

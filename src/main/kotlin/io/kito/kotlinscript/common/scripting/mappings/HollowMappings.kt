@@ -22,12 +22,12 @@
  * SOFTWARE.
  */
 
-package ru.hollowhorizon.kotlinscript.common.scripting.mappings
+package io.kito.kotlinscript.common.scripting.mappings
 
 
+import io.kito.kotlinscript.client.util.nbt.*
 import kotlinx.serialization.Serializable
 import org.objectweb.asm.tree.ClassNode
-import ru.hollowhorizon.hc.client.utils.nbt.*
 import java.io.DataInputStream
 import java.io.File
 import java.io.InputStream

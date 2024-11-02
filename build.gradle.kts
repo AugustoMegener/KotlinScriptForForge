@@ -2,7 +2,7 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import net.minecraftforge.gradle.common.util.RunConfig
 import net.minecraftforge.gradle.userdev.UserDevExtension
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import org.spongepowered.asm.gradle.plugins.MixinExtension
+//import org.spongepowered.asm.gradle.plugins.MixinExtension
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
@@ -19,11 +19,11 @@ val userConfig = Properties()
 val cfg = rootProject.file("user.properties")
 if (cfg.exists()) userConfig.load(cfg.inputStream())
 
-buildscript {
+/*buildscript {
     dependencies {
         classpath("org.spongepowered:mixingradle:0.7.38")
     }
-}
+}*/
 
 plugins {
     id("net.minecraftforge.gradle")
@@ -34,7 +34,7 @@ plugins {
     `maven-publish`
 }
 
-apply(plugin = "org.spongepowered.mixin")
+/*apply(plugin = "org.spongepowered.mixin")*/
 
 group = mod_group
 version = mod_version
@@ -63,7 +63,7 @@ configure<UserDevExtension> {
             )
         )
         //jvmArg("-XX:+AllowEnhancedClassRedefinition")
-        arg("-mixin.config=$mod_id.mixins.json")
+        /*arg("-mixin.config=$mod_id.mixins.json")*/
         mods.create(mod_id) {
             source(the<JavaPluginExtension>().sourceSets.getByName("main"))
         }
@@ -102,14 +102,13 @@ dependencies {
 
     minecraft("net.minecraftforge:forge:$minecraft_version-$forge_version")
 
-    annotationProcessor("org.spongepowered:mixin:0.8.5:processor")
+    /*annotationProcessor("org.spongepowered:mixin:0.8.5:processor")*/
 
-    implementation("thedarkcolour:kotlinforforge:3.12.0")
-    implementation(fg.deobf("ru.hollowhorizon:hc:1.19.2-1.3.2"))
+    implementation("thedarkcolour:kotlinforforge:4.11.0")
     shadow("gnu.trove:trove:1.0.2")
-    implementation(fg.deobf("curse.maven:embeddium-908741:4984830"))
-    implementation(fg.deobf("curse.maven:oculus-581495:4763262"))
-    implementation(fg.deobf("curse.maven:spark-361579:4505309"))
+    //implementation(fg.deobf("curse.maven:embeddium-908741:4984830"))
+    //implementation(fg.deobf("curse.maven:oculus-581495:4763262"))
+    //implementation(fg.deobf("curse.maven:spark-361579:4505309"))
 
     val withoutKotlinStd: ExternalModuleDependency.() -> Unit = {
         exclude("gnu.trove", "trove")
@@ -149,9 +148,9 @@ fun Jar.createManifest() = manifest {
     )
 }
 
-configure<MixinExtension> {
+/*configure<MixinExtension> {
     add(sourceSets.main.get(), "$mod_id.refmap.json")
-}
+}*/
 
 val jar = tasks.named<Jar>("jar") {
     archiveClassifier.set("lite")
